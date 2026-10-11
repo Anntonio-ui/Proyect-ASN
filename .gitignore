@@ -141,3 +141,18 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+# Dependencias y compilación
+node_modules/
+dist/
+
+# Configuración local y secretos
+.env
+.env.*
+!.env.example
+local.settings.json
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
