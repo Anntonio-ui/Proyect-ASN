@@ -123,7 +123,6 @@ no comprueban las consultas ni la conexión PostgreSQL.
 - Conexión con PostgreSQL real.
 - Listado, registro y eliminación persistentes.
 - Carnet duplicado contra la base real.
-- Despliegue en Azure.
 - CORS con el origen de Google Cloud Run.
 - Integración con el frontend.
 
@@ -136,3 +135,12 @@ No registrar estudiantes reales en una publicación abierta
 sin acordar primero el control de acceso.
 
 Los errores HTTP internos no exponen detalles técnicos.
+
+## Despliegue disponible
+
+URL base: https://asn-api-william.azurewebsites.net/api
+
+Health y validaciones de entrada comprobados en Azure.
+La conexión PostgreSQL sigue pendiente.
+
+Consultar ../docs/despliegue-azure.md.
