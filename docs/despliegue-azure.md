@@ -66,3 +66,14 @@ UseDevelopmentStorage=true corresponde únicamente a Azurite local.
 No establecer ese valor en Azure.
 
 No guardar credenciales en GitHub ni en esta documentación.
+
+## CORS local comprobado
+
+Origen autorizado: http://localhost:5173.
+
+Preflight OPTIONS para POST:
+- Respuesta: 204.
+- Access-Control-Allow-Origin: http://localhost:5173.
+- Método POST y header content-type autorizados.
+
+Las dos comprobaciones del PR #2 también aprobaron.
