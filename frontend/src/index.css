@@ -1,9 +1,51 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Tokens de diseño: dashboard lavanda (referencia "Brainy")
+   Se usan como clases: bg-violeta, text-tinta, shadow-suave...
+   ============================================================ */
+@theme {
+  /* Fondos */
+  --color-lavanda: #ddd5f3;
+  --color-rosa: #e8d5eb;
+
+  /* Acciones */
+  --color-violeta: #7775f5;
+  --color-violeta-fuerte: #5b59e0; /* botones con texto blanco (mejor contraste) */
+  --color-azul: #586ef1;
+
+  /* Texto */
+  --color-tinta: #35343b;
+  --color-tinta-suave: #6b6675; /* un poco más oscuro que #77727f para legibilidad */
+
+  /* Pasteles para iconos y estados */
+  --color-pastel-rosa: #ffdadb;
+  --color-pastel-verde: #dfffbc;
+  --color-pastel-amarillo: #fff3bd;
+  --color-pastel-violeta: #ece8fb;
+
+  /* Estados */
+  --color-peligro: #e5484d;
+  --color-peligro-suave: #ffe3e4;
+
+  /* Esquinas */
+  --radius-tarjeta: 1.25rem;
+  --radius-panel: 1.75rem;
+  --radius-contenedor: 2rem;
+
+  /* Sombras con matiz violeta */
+  --shadow-suave: 0 10px 30px rgba(119, 117, 245, 0.12);
+  --shadow-flotante: 0 20px 50px rgba(119, 117, 245, 0.22);
+
+  /* Tipografía (sin descargar fuentes externas) */
+  --font-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system,
+    Arial, sans-serif;
+}
+
 :root {
-  font-family: Arial, sans-serif;
-  color: #35343b;
-  background: #ddd5f3;
+  font-family: var(--font-sans);
+  color: var(--color-tinta);
+  background: var(--color-lavanda);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,6 +56,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* Gradientes difuminados lavanda y rosa de la referencia */
+  background:
+    radial-gradient(60rem 40rem at 10% 0%, #d6cdf5 0%, transparent 60%),
+    radial-gradient(50rem 40rem at 100% 100%, #ecd3ee 0%, transparent 60%),
+    linear-gradient(135deg, #dfd8f5 0%, #e8d9f0 100%);
+  background-attachment: fixed;
 }
 
 button,
@@ -21,4 +69,22 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+/* Foco visible para navegación con teclado */
+:focus-visible {
+  outline: 3px solid var(--color-azul);
+  outline-offset: 2px;
+}
+
+/* Respeto por movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
