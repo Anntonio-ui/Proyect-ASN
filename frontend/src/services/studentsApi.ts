@@ -1,4 +1,4 @@
-import type { ApiErrorCode, Student } from '../types/student'
+import type { ApiErrorCode, NewStudent, Student } from '../types/student'
 
 /**
  * Único módulo que habla con la API de estudiantes.
@@ -94,6 +94,15 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   return response
 }
 
+/** Lee el cuerpo de una respuesta exitosa que debe ser JSON. */
+async function readJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json()
+  } catch {
+    throw new ApiError('La respuesta del servidor no es válida.', 'RESPUESTA_INVALIDA', response.status)
+  }
+}
+
 /** True si el error es una cancelación voluntaria (AbortController), no un fallo real. */
 export function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError'
@@ -108,14 +117,33 @@ export function asApiError(error: unknown): ApiError {
 /** GET /estudiantes → 200 con arreglo (vacío si no hay registros), ordenado por id. */
 export async function listarEstudiantes(signal?: AbortSignal): Promise<Student[]> {
   const response = await request('/estudiantes', { method: 'GET', signal })
-  let data: unknown
-  try {
-    data = await response.json()
-  } catch {
-    throw new ApiError('La respuesta del servidor no es válida.', 'RESPUESTA_INVALIDA', response.status)
-  }
+  const data = await readJson(response)
   if (!Array.isArray(data) || !data.every(isStudent)) {
     throw new ApiError('La respuesta del servidor no tiene el formato esperado.', 'RESPUESTA_INVALIDA', response.status)
   }
   return data
+}
+
+/**
+ * POST /estudiantes → 201 con el estudiante creado (incluye id).
+ * Se envían solo los cuatro campos del contrato: la API rechaza campos adicionales.
+ */
+export async function crearEstudiante(data: NewStudent, signal?: AbortSignal): Promise<Student> {
+  const body = JSON.stringify({
+    nombres: data.nombres,
+    apellidos: data.apellidos,
+    carnet: data.carnet,
+    edad: data.edad,
+  })
+  const response = await request('/estudiantes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+    signal,
+  })
+  const created = await readJson(response)
+  if (!isStudent(created)) {
+    throw new ApiError('La respuesta del servidor no tiene el formato esperado.', 'RESPUESTA_INVALIDA', response.status)
+  }
+  return created
 }
