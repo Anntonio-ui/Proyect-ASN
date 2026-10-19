@@ -10,7 +10,7 @@ Responsable de integración frontend: Helen.
 ## Direcciones
 
 Local: http://localhost:7071/api
-Producción: pendiente del despliegue en Azure.
+Producción: https://asn-api-william.azurewebsites.net/api
 
 El frontend utiliza VITE_API_BASE_URL.
 Su valor termina en /api, sin barra final.
