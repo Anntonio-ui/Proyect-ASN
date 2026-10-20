@@ -1,0 +1,15 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --build-arg
+      - VITE_API_BASE_URL=${_API_URL}
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/asn-repo/frontend:${_TAG}
+      - frontend
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/asn-repo/frontend:${_TAG}
+substitutions:
+  _REGION: us-central1
+  _TAG: v1
+  _API_URL: https://asn-api-william.azurewebsites.net/api

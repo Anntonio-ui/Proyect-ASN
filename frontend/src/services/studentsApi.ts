@@ -1,4 +1,4 @@
-import type { ApiErrorCode, Student } from '../types/student'
+import type { ApiErrorCode, NewStudent, Student } from '../types/student'
 
 /**
  * Único módulo que habla con la API de estudiantes.
@@ -37,11 +37,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isStudent(value: unknown): value is Student {
   return (
     isRecord(value) &&
-    typeof value.id === 'number' &&
+    typeof value.id === 'number' && Number.isInteger(value.id) && value.id > 0 &&
     typeof value.nombres === 'string' &&
     typeof value.apellidos === 'string' &&
     typeof value.carnet === 'string' &&
-    typeof value.edad === 'number'
+    typeof value.edad === 'number' && Number.isInteger(value.edad) && value.edad >= 0 && value.edad <= 120
   )
 }
 
@@ -83,7 +83,7 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   try {
     response = await fetch(url, init)
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    if (isAbortError(error)) throw error
     throw new ApiError(
       'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
       'ERROR_RED',
@@ -94,9 +94,21 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   return response
 }
 
-/** True si el error es una cancelación voluntaria (AbortController), no un fallo real. */
+/** Lee el cuerpo de una respuesta exitosa que debe ser JSON. */
+async function readJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json()
+  } catch {
+    throw new ApiError('La respuesta del servidor no es válida.', 'RESPUESTA_INVALIDA', response.status)
+  }
+}
+
+/**
+ * True si el error es una cancelación voluntaria (AbortController), no un fallo real.
+ * Se compara por nombre y no con instanceof, para que funcione igual en el navegador y en las pruebas.
+ */
 export function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError'
+  return isRecord(error) && error.name === 'AbortError'
 }
 
 /** Garantiza un ApiError para mostrar en pantalla, sea cual sea lo que se haya lanzado. */
@@ -108,14 +120,45 @@ export function asApiError(error: unknown): ApiError {
 /** GET /estudiantes → 200 con arreglo (vacío si no hay registros), ordenado por id. */
 export async function listarEstudiantes(signal?: AbortSignal): Promise<Student[]> {
   const response = await request('/estudiantes', { method: 'GET', signal })
-  let data: unknown
-  try {
-    data = await response.json()
-  } catch {
-    throw new ApiError('La respuesta del servidor no es válida.', 'RESPUESTA_INVALIDA', response.status)
-  }
+  const data = await readJson(response)
   if (!Array.isArray(data) || !data.every(isStudent)) {
     throw new ApiError('La respuesta del servidor no tiene el formato esperado.', 'RESPUESTA_INVALIDA', response.status)
   }
   return data
+}
+
+/**
+ * POST /estudiantes → 201 con el estudiante creado (incluye id).
+ * Se envían solo los cuatro campos del contrato: la API rechaza campos adicionales.
+ */
+export async function crearEstudiante(data: NewStudent, signal?: AbortSignal): Promise<Student> {
+  const body = JSON.stringify({
+    nombres: data.nombres,
+    apellidos: data.apellidos,
+    carnet: data.carnet,
+    edad: data.edad,
+  })
+  const response = await request('/estudiantes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+    signal,
+  })
+  const created = await readJson(response)
+  if (!isStudent(created)) {
+    throw new ApiError('La respuesta del servidor no tiene el formato esperado.', 'RESPUESTA_INVALIDA', response.status)
+  }
+  return created
+}
+
+/**
+ * DELETE /estudiantes/{id} → 204 sin contenido.
+ * Una respuesta 204 no trae cuerpo, así que no se intenta leer JSON.
+ * Si el estudiante ya no existe la API responde 404 y se lanza ApiError ESTUDIANTE_NO_ENCONTRADO.
+ */
+export async function eliminarEstudiante(id: number, signal?: AbortSignal): Promise<void> {
+  if (!Number.isInteger(id) || id < 1 || id > 2_147_483_647) {
+    throw new ApiError('El identificador del estudiante no es válido.', 'DATOS_INVALIDOS', null)
+  }
+  await request(`/estudiantes/${id}`, { method: 'DELETE', signal })
 }

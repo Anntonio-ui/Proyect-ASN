@@ -9,7 +9,7 @@ type AppShellProps = {
 // Marco general: contenedor translúcido con cabecera, barra lateral y contenido.
 export function AppShell({ header, sidebar, children }: AppShellProps) {
   return (
-    <div className="min-h-screen px-3 py-4 sm:px-6 sm:py-8">
+    <div className="min-h-screen px-3 py-4 sm:px-6 sm:py-10">
       <a
         href="#contenido-principal"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:font-semibold focus:text-violeta-fuerte"
@@ -22,12 +22,12 @@ export function AppShell({ header, sidebar, children }: AppShellProps) {
           {header}
         </div>
 
-        <div className="grid gap-6 p-4 sm:p-6 lg:grid-cols-[200px_1fr]">
-          <aside>{sidebar}</aside>
+        <div className="grid gap-6 p-4 sm:p-6 lg:grid-cols-[190px_1fr]">
+          <aside className="sidebar-column">{sidebar}</aside>
           <main
             id="contenido-principal"
             tabIndex={-1}
-            className="min-w-0 focus:outline-none"
+            className="content-column min-w-0"
           >
             {children}
           </main>
