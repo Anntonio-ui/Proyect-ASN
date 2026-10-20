@@ -88,7 +88,7 @@ jobs:
         run: |
           docker run -d --name asn-ci -e PORT=9090 -p 9090:9090 asn-frontend:ci
           trap 'docker logs asn-ci; docker rm -f asn-ci' EXIT
-          curl --fail --retry 15 --retry-connrefused --retry-delay 1 http://localhost:9090/healthz
+          curl --fail --retry 15 --retry-all-errors --retry-delay 1 --max-time 5 --retry-max-time 60 http://localhost:9090/healthz
           curl --fail http://localhost:9090/ | grep -q 'Gestión de estudiantes'
           curl --fail http://localhost:9090/estudiantes | grep -q 'id="root"'
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:9090/assets/no-existe.js)" = "404"
