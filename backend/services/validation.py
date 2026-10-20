@@ -56,6 +56,9 @@ def validate_student_id(value):
     if not value.isascii() or not value.isdecimal():
         raise ValidationError("El id debe ser un entero positivo.")
 
+    if len(value) > 10:
+        raise ValidationError("El id está fuera del rango permitido.")
+
     student_id = int(value)
 
     if not 1 <= student_id <= 2_147_483_647:

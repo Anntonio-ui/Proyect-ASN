@@ -217,7 +217,7 @@ describe('eliminarEstudiante', () => {
 
   it('un id que no es entero (NaN, 1.5, Infinity) falla antes de llamar a fetch', async () => {
     simular(async () => new Response(null, { status: 204 }))
-    for (const id of [Number.NaN, 1.5, Infinity]) {
+    for (const id of [Number.NaN, 1.5, Infinity, 0, -1, 2_147_483_648]) {
       expect((await fallo(eliminarEstudiante(id))).codigo).toBe('DATOS_INVALIDOS')
     }
     expect(calls).toHaveLength(0)

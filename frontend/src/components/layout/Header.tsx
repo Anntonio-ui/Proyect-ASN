@@ -1,4 +1,5 @@
 import { GraduationCap, Search, UserPlus } from 'lucide-react'
+import { ClubCrest } from '../team/TeamSection'
 import { APP_CONFIG } from '../../config/appConfig'
 
 type HeaderProps = {
@@ -17,7 +18,7 @@ export function Header({
   onRegisterClick,
 }: HeaderProps) {
   return (
-    <header className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4 sm:px-8 sm:py-5 lg:flex-nowrap">
+    <header className="flex flex-wrap items-center gap-x-5 gap-y-3 px-4 py-4 sm:px-8 sm:py-5 lg:flex-nowrap">
       {/* Marca */}
       <div className="flex items-center gap-2">
         <span
@@ -26,7 +27,7 @@ export function Header({
         >
           <GraduationCap className="size-5" />
         </span>
-        <span className="text-lg font-bold text-violeta-fuerte">
+        <span className="text-base font-bold text-violeta-fuerte">
           {APP_CONFIG.name}
         </span>
       </div>
@@ -35,7 +36,7 @@ export function Header({
       <h1 className="text-xl font-bold text-tinta">{sectionTitle}</h1>
 
       {/* Buscador (en móvil pasa a su propia fila) */}
-      <div className="relative order-last w-full lg:order-none lg:w-72">
+      <div className="relative order-last w-full lg:order-none lg:w-60">
         <label htmlFor="buscador-estudiantes" className="sr-only">
           Buscar estudiantes
         </label>
@@ -64,16 +65,7 @@ export function Header({
           Registrar estudiante
         </button>
 
-        {/* MARCADOR: escudo del Barcelona (recurso pendiente).
-            Sustituir por <img src="..." alt="Escudo del FC Barcelona" />
-            Medidas recomendadas: 256x256 px, PNG o SVG con fondo transparente. */}
-        <div
-          role="img"
-          aria-label="Marcador del escudo del Barcelona, pendiente de recurso"
-          className="grid size-11 place-items-center rounded-full border-2 border-dashed border-violeta/60 bg-pastel-violeta text-[10px] font-semibold text-tinta-suave"
-        >
-          Escudo
-        </div>
+        <ClubCrest compact />
       </div>
     </header>
   )

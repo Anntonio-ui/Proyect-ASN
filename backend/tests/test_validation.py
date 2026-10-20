@@ -68,7 +68,7 @@ class StudentValidationTests(unittest.TestCase):
         self.assertEqual(validate_student_id("12"), 12)
 
     def test_rejects_invalid_id(self):
-        for value in ("0", "-1", "abc", "1.5", "2147483648"):
+        for value in ("0", "-1", "abc", "1.5", "2147483648", "9" * 5000):
             with self.subTest(value=value):
                 with self.assertRaises(ValidationError):
                     validate_student_id(value)

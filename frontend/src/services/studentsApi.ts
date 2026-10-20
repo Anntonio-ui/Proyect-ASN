@@ -37,11 +37,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isStudent(value: unknown): value is Student {
   return (
     isRecord(value) &&
-    typeof value.id === 'number' &&
+    typeof value.id === 'number' && Number.isInteger(value.id) && value.id > 0 &&
     typeof value.nombres === 'string' &&
     typeof value.apellidos === 'string' &&
     typeof value.carnet === 'string' &&
-    typeof value.edad === 'number'
+    typeof value.edad === 'number' && Number.isInteger(value.edad) && value.edad >= 0 && value.edad <= 120
   )
 }
 
@@ -157,7 +157,7 @@ export async function crearEstudiante(data: NewStudent, signal?: AbortSignal): P
  * Si el estudiante ya no existe la API responde 404 y se lanza ApiError ESTUDIANTE_NO_ENCONTRADO.
  */
 export async function eliminarEstudiante(id: number, signal?: AbortSignal): Promise<void> {
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(id) || id < 1 || id > 2_147_483_647) {
     throw new ApiError('El identificador del estudiante no es válido.', 'DATOS_INVALIDOS', null)
   }
   await request(`/estudiantes/${id}`, { method: 'DELETE', signal })

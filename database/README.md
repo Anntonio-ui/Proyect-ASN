@@ -1,16 +1,47 @@
-# Módulo de Base de Datos - ASN441
+# PostgreSQL — ASN441
 
-**Responsable:** Gabriel  
-**Tecnología:** PostgreSQL (Azure Database for PostgreSQL)
+Responsable inicial: Gabriel. Integración: William.
 
-## Estructura del Módulo
-- `schema.sql`: Script DDL para la creación de la tabla `estudiantes`, restricciones de integridad (carnet único, textos no vacíos, rango de edad de 0 a 120) y migración segura (`ALTER TABLE`).
-- `seed.sql`: Datos ficticios iniciales de prueba (idempotentes mediante `ON CONFLICT`).
+## Archivos definitivos
 
-## Instrucciones de Ejecución
+- `schema.sql`: creación y migración en una transacción, sin borrar registros.
+- `seed.sql`: cuatro estudiantes ficticios; se puede repetir sin duplicar sus carnets.
 
-1. Conéctate a tu instancia de PostgreSQL en Azure utilizando tu cliente preferido (pgAdmin, DBeaver, VS Code Extension o psql).
-2. Selecciona o crea la base de datos del proyecto.
-3. Ejecuta el script de esquema para crear o actualizar la tabla sin perder datos:
-   ```bash
-   psql -h <tu-servidor>.postgres.database.azure.com -U <usuario> -d <nombre-bd> -f database/schema.sql
+Desde la raíz, con psql instalado (PowerShell):
+
+```powershell
+$env:PGSSLMODE = "require"
+psql -h HOST_DE_GABRIEL -U USUARIO -d BASE_DE_DATOS -v ON_ERROR_STOP=1 -f database/schema.sql
+psql -h HOST_DE_GABRIEL -U USUARIO -d BASE_DE_DATOS -v ON_ERROR_STOP=1 -f database/seed.sql
+```
+
+psql solicita la contraseña cuando sea necesaria. No escribirla en comandos ni subirla.
+No ejecutar sobre otra base de datos ni borrar tablas para solucionar migraciones.
+
+El esquema establece carnet de hasta 30 caracteres y edad de 0 a 120. Se conservan
+ceros iniciales. La API normaliza a mayúsculas. Un índice protege la unicidad sin
+importar mayúsculas o espacios exteriores.
+
+Si existen datos anteriores, respaldar primero. La migración normaliza los carnets;
+si encuentra duplicados o datos inválidos, debe corregirlos el responsable antes de
+reintentar. La transacción revierte los cambios cuando falla una instrucción.
+
+## Verificación
+
+En psql:
+
+```sql
+\d estudiantes
+SELECT id, nombres, apellidos, carnet, edad FROM estudiantes ORDER BY id;
+SELECT carnet, COUNT(*) FROM estudiantes GROUP BY carnet HAVING COUNT(*) > 1;
+```
+
+Configurar el usuario de aplicación con SELECT, INSERT, DELETE sobre estudiantes
+y USAGE sobre la secuencia de identidad. No necesita permisos de administración.
+El propietario ejecuta las migraciones. Coordinar nombres de roles con Gabriel.
+
+## Datos pendientes de entregar
+
+Host, puerto, base, usuario y contraseña por canal seguro, además del acceso de red
+para la computadora y Azure Functions. La presencia de estos scripts NO demuestra
+que PostgreSQL esté desplegado ni que las operaciones se hayan comprobado.

@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/.venv
+**/__pycache__
+**/dist
+**/coverage
+**/.env
+**/.env.*
+**/local.settings.json
+**/*.pem
+**/*.key
