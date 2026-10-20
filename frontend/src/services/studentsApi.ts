@@ -83,7 +83,7 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   try {
     response = await fetch(url, init)
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    if (isAbortError(error)) throw error
     throw new ApiError(
       'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
       'ERROR_RED',
@@ -103,9 +103,12 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
-/** True si el error es una cancelación voluntaria (AbortController), no un fallo real. */
+/**
+ * True si el error es una cancelación voluntaria (AbortController), no un fallo real.
+ * Se compara por nombre y no con instanceof, para que funcione igual en el navegador y en las pruebas.
+ */
 export function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError'
+  return isRecord(error) && error.name === 'AbortError'
 }
 
 /** Garantiza un ApiError para mostrar en pantalla, sea cual sea lo que se haya lanzado. */
